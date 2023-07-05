@@ -14,7 +14,7 @@ module.exports = (passport: PassportStatic) =>
   passport.use(
     new JwtStrategy(options, async (token, done) => {
       try {
-        const user = await userRepository.findOne({ where: { id: token.id } });
+        const user = await userRepository.findOne({ where: { email: token.email } });
         if (user) {
           return done(null, user);
         }

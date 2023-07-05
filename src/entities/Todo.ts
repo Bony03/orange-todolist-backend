@@ -24,6 +24,6 @@ export class Todo implements IObjectKeys {
   @Column()
   created: number;
 
-  @Column()
+  @Column((type) => Users)
   user: ObjectId;
 }

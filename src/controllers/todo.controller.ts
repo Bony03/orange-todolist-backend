@@ -6,6 +6,7 @@ import { ObjectId } from 'typeorm';
 import UsersService from '../services/user.service';
 import { ParsedQs } from 'qs';
 import { IUser } from '../types/user.type';
+import { todosRepository } from '../config/data.source';
 
 export class TodoController {
   constructor(private todoService: TodoService, private userService: UsersService) {}
@@ -47,6 +48,7 @@ export class TodoController {
       where: { ...q, user: user.id }
     };
     const todos = await this.todoService.getAll(findOptions);
+
     res.status(200).json({
       todos,
       perPage: realTake,
@@ -73,7 +75,7 @@ export class TodoController {
     todo.created = Date.now();
     const savedTodo = await this.todoService.saveTodo(todo);
     user.todos = [...user.todos, savedTodo._id];
-    user.todosCount = user.todosCount + 1;
+    user.todosCount = user.todos.length;
     await this.userService.updateUser(user);
     res.send(savedTodo);
   }

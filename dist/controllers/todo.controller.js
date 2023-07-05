@@ -70,7 +70,7 @@ class TodoController {
         todo.created = Date.now();
         const savedTodo = await this.todoService.saveTodo(todo);
         user.todos = [...user.todos, savedTodo._id];
-        user.todosCount = user.todosCount + 1;
+        user.todosCount = user.todos.length;
         await this.userService.updateUser(user);
         res.send(savedTodo);
     }

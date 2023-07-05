@@ -22,8 +22,8 @@ export class UsersController {
     return bcrypt.compare(pass, hash);
   }
 
-  generateToken = (_id: ObjectId, period = process.env.JWT_EXPIRATION) =>
-    jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: period });
+  generateToken = (email: string, period = process.env.JWT_EXPIRATION) =>
+    jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: period });
 
   verifyToken = (token: string) => jwt.verify(token, process.env.JWT_SECRET);
 
@@ -44,7 +44,7 @@ export class UsersController {
     newUser.todosCount = 0;
     const user = await this.userService.createUser(newUser);
     await this.mailService.sendActivationMessage(newUser.email, newUser.activation, user.name);
-    const token = this.generateToken(user.id);
+    const token = this.generateToken(user.email);
     res.json({ token, data: { email: user.email, name: user.name } });
   }
 
@@ -58,7 +58,7 @@ export class UsersController {
     if (!isPassEqual) {
       throw new Error('Incorrect email or password');
     }
-    const token = this.generateToken(user.id);
+    const token = this.generateToken(user.email);
     res.json({ token, data: { email: user.email, name: user.name } });
   }
 
@@ -95,7 +95,7 @@ export class UsersController {
     if (!user) {
       throw new Error('User not found');
     }
-    const token = this.generateToken(user.id);
+    const token = this.generateToken(user.email);
     await this.mailService.sendResetMessage(email, token, user.name);
     res.json({ message: 'Reset link successfully send to your email' });
   }
@@ -117,7 +117,7 @@ export class UsersController {
       id: user.id,
       isActivated: user.isActivated
     };
-    const token = this.generateToken(user.id);
+    const token = this.generateToken(user.email);
     res.json({ data, token, message: 'Successfully authorizated' });
   }
 }

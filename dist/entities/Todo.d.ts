@@ -8,4 +8,5 @@ export declare class Todo implements IObjectKeys {
     isPrivate: boolean;
     completed: boolean;
     created: number;
+    user: ObjectId;
 }

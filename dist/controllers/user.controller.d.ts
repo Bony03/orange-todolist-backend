@@ -2,14 +2,13 @@ import { Response, Request } from 'express';
 import jwt from 'jsonwebtoken';
 import UsersService from '../services/user.service';
 import { MailService } from '../services/mail.service';
-import { ObjectId } from 'typeorm';
 export declare class UsersController {
     private userService;
     private mailService;
     constructor(userService: UsersService, mailService: MailService);
     hashFunc(pass: string): Promise<string>;
     compareFunc(pass: string, hash: string): Promise<boolean>;
-    generateToken: (_id: ObjectId, period?: string) => string;
+    generateToken: (email: string, period?: string) => string;
     verifyToken: (token: string) => string | jwt.JwtPayload;
     register(req: Request, res: Response): Promise<void>;
     login(req: Request, res: Response): Promise<void>;

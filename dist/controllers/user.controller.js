@@ -15,7 +15,7 @@ class UsersController {
     constructor(userService, mailService) {
         this.userService = userService;
         this.mailService = mailService;
-        this.generateToken = (_id, period = process.env.JWT_EXPIRATION) => jsonwebtoken_1.default.sign({ _id }, process.env.JWT_SECRET, { expiresIn: period });
+        this.generateToken = (email, period = process.env.JWT_EXPIRATION) => jsonwebtoken_1.default.sign({ email }, process.env.JWT_SECRET, { expiresIn: period });
         this.verifyToken = (token) => jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
     }
     async hashFunc(pass) {
@@ -42,7 +42,7 @@ class UsersController {
         newUser.todosCount = 0;
         const user = await this.userService.createUser(newUser);
         await this.mailService.sendActivationMessage(newUser.email, newUser.activation, user.name);
-        const token = this.generateToken(user.id);
+        const token = this.generateToken(user.email);
         res.json({ token, data: { email: user.email, name: user.name } });
     }
     async login(req, res) {
@@ -55,7 +55,7 @@ class UsersController {
         if (!isPassEqual) {
             throw new Error('Incorrect email or password');
         }
-        const token = this.generateToken(user.id);
+        const token = this.generateToken(user.email);
         res.json({ token, data: { email: user.email, name: user.name } });
     }
     async activate(req, res) {
@@ -89,7 +89,7 @@ class UsersController {
         if (!user) {
             throw new Error('User not found');
         }
-        const token = this.generateToken(user.id);
+        const token = this.generateToken(user.email);
         await this.mailService.sendResetMessage(email, token, user.name);
         res.json({ message: 'Reset link successfully send to your email' });
     }
@@ -109,7 +109,7 @@ class UsersController {
             id: user.id,
             isActivated: user.isActivated
         };
-        const token = this.generateToken(user.id);
+        const token = this.generateToken(user.email);
         res.json({ data, token, message: 'Successfully authorizated' });
     }
 }
