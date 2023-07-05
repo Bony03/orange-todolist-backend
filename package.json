@@ -10,7 +10,7 @@
     "deploy": "node dist/server.js",
     "watch-deploy": "nodemon dist/server.js",
     "server": "concurrently \"npm run watch-tsc\" \"npm run watch-deploy\"",
-    "start": "concurrently \"npm run build\" \"npm run deploy\"",
+    "start": "node dist/server.js",
     "build": "tsc"
   },
   "dependencies": {
