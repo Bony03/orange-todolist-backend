@@ -48,7 +48,6 @@ export class TodoController {
       where: { ...q, user: user.id }
     };
     const todos = await this.todoService.getAll(findOptions);
-
     res.status(200).json({
       todos,
       perPage: realTake,
