@@ -6,7 +6,6 @@ import { ObjectId } from 'typeorm';
 import UsersService from '../services/user.service';
 import { ParsedQs } from 'qs';
 import { IUser } from '../types/user.type';
-import { todosRepository } from '../config/data.source';
 
 export class TodoController {
   constructor(private todoService: TodoService, private userService: UsersService) {}
@@ -45,7 +44,7 @@ export class TodoController {
     const findOptions = {
       take: realTake,
       skip: realPage,
-      where: { ...q, user: user.id }
+      where: { ...q, user: user._id }
     };
     const todos = await this.todoService.getAll(findOptions);
     res.status(200).json({
@@ -70,7 +69,7 @@ export class TodoController {
         todo[i as keyof ITodo] = data[i];
       }
     }
-    todo.user = user.id;
+    todo.user = user._id;
     todo.created = Date.now();
     const savedTodo = await this.todoService.saveTodo(todo);
     user.todos = [...user.todos, savedTodo._id];
@@ -86,23 +85,25 @@ export class TodoController {
   }
 
   async updateTodo(req: Request, res: Response) {
-    const { todo, data } = req.body;
+    const { todo, data, user } = req.body;
     for (const i in data) {
       if (todo.hasOwnProperty.call(data, i)) {
         todo[i] = data[i];
       }
     }
-    const newTodo = await this.todoService.saveTodo(todo);
-    res.send(newTodo);
+    todo.user = user._id;
+    const result = await this.todoService.updateTodo(todo);
+    if (result.modifiedCount === 1) {
+      res.send('Successfully updated');
+    }
   }
 
   async deleteTodo(req: Request, res: Response) {
     const { todo } = req.body;
     const { user } = req.body;
-    await this.todoService.removeOne(todo);
-    user.todosCount = user.todosCount - 1;
-    user.todos = user.todos.filter((item: ObjectId) => item !== todo.id);
-    res.send('todo successfully removed');
+    await this.todoService.removeOne(todo._id);
+    await this.userService.updateUserTodos(user, todo._id);
+    res.send('Todo successfully removed');
   }
 }
 

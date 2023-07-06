@@ -1,5 +1,6 @@
 import { Users } from '../entities/User';
 import { userRepository } from '../config/data.source';
+import { ObjectId } from 'typeorm';
 
 export default class UsersService {
   async getUserByEmail(email: string) {
@@ -25,6 +26,14 @@ export default class UsersService {
   async updateUser(userData: Users) {
     const data = await userRepository.save(userData);
     return data;
+  }
+
+  async updateUserTodos(userData: Users, todoId: any) {
+    await userRepository.updateOne({ _id: userData._id }, { $pull: { todos: todoId } });
+    await userRepository.updateOne(
+      { _id: userData._id },
+      { $set: { todosCount: userData.todosCount - 1 } }
+    );
   }
 }
 
