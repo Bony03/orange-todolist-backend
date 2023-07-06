@@ -13,7 +13,7 @@ export interface IUser {
   email: string;
   name: string;
   isActivated: boolean;
-  id: ObjectId;
+  _id: ObjectId;
   password: string;
   todos: ObjectId[];
   todosCount: number;

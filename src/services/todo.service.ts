@@ -1,6 +1,7 @@
 import { Todo } from '../entities/Todo';
 import { todosRepository } from '../config/data.source';
 import { IQuery, ITodo } from '../types/todos.type';
+import { ObjectId } from 'mongodb';
 
 export default class TodoService {
   async saveTodo(todo: ITodo) {
@@ -8,9 +9,17 @@ export default class TodoService {
     return data;
   }
 
-  async getOne(id: string) {
-    const data = await todosRepository.find({ where: { 'user.id': id } });
+  async updateTodo(todo: ITodo) {
+    const data = await todosRepository.replaceOne(
+      { _id: new ObjectId(todo._id) },
+      { ...todo, _id: new ObjectId(todo._id) }
+    );
     return data;
+  }
+
+  async getOne(id: string) {
+    const data = await todosRepository.find({ where: { _id: new ObjectId(id) } });
+    return data[0];
   }
 
   async getAll(findOptions: IQuery) {
@@ -23,8 +32,8 @@ export default class TodoService {
     return data;
   }
 
-  async removeOne(todo: Todo) {
-    await todosRepository.remove(todo);
+  async removeOne(_id: ObjectId) {
+    await todosRepository.delete({ _id: _id });
   }
 }
 
